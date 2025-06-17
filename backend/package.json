@@ -1,16 +1,17 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "module-alias": "^2.2.2",
     "path": "^0.12.7"
+  },
+  "_moduleAliases": {
+    "@": "."
   }
 }

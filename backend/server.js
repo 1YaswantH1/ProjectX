@@ -1,12 +1,14 @@
 const express = require("express");
 const path = require("path");
 const dotenv = require("dotenv");
-dotenv.config({ path: path.resolve(__dirname, "./dotenv/config.env") });
+const module_alias = require('module-alias/register');
+
+dotenv.config({ path: path.resolve(__dirname, "@/dotenv/config.env") });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const dbConnection = require("./db_connection/db");
+const dbConnection = require("@/db_connection/db");
 dbConnection();
 
 app.use(express.urlencoded({ extended: true }));
