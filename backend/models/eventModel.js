@@ -1,58 +1,33 @@
 const mongoose = require("mongoose");
 
 const eventSchema = new mongoose.Schema({
-    title: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    description: {
-        type: String,
-        required: true
-    },
-    eventDate: {
-        type: Date,
-        required: true
-    },
-    time: {
-        type: String,
-        required: true
-    },
-    location: {
-        type: String,
-        required: true
-    },
-
+    title: { type: String, required: true },
+    description: String,
+    eventDate: { type: Date, required: true },
+    time: { type: String, required: true },
+    location: { type: String, required: true },
     registrationStartDate: {
         type: Date,
-        required: true
+        required: true,
+        validate: {
+            validator: function (value) {
+                return value >= new Date();
+            },
+            message: "Registration start date must be now or in the future.",
+        },
     },
     registrationEndDate: {
         type: Date,
-        required: true
+        required: true,
+        validate: {
+            validator: function (value) {
+                return value > this.registrationStartDate;
+            },
+            message: "Registration end date must be after the start date.",
+        },
     },
-    totalRegistrations: {
-        type: Number,
-        default: 0
-    },
-
-    registeredMembers: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Student"
-        }
-    ],
-
-    createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true
-    },
-
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
+    createdBy: { type: String, required: true }
 });
 
-module.exports = mongoose.model("Event", eventSchema);
+const Event = mongoose.model("Event", eventSchema);
+module.exports = Event;

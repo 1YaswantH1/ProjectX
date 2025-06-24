@@ -9,7 +9,6 @@ export default function Home() {
         "/images/slide1.jpg",
         "/images/slide2.jpg",
         "/images/slide3.jpg"
-        // Add more image paths as needed
     ];
 
 
