@@ -15,6 +15,7 @@ const EventForm = () => {
 
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const api_events = import.meta.env.VITE_API_EVENTS;
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -50,7 +51,7 @@ const EventForm = () => {
         if (!validateDates()) return;
 
         try {
-            await axios.post("http://localhost:3000/api/events", formData);
+            await axios.post(api_events, formData);
             setSuccess("Event created successfully!");
             setFormData({
                 title: "",
@@ -71,94 +72,107 @@ const EventForm = () => {
         <div className="max-w-xl mx-auto p-6 bg-base-200 rounded-box shadow-md mt-8">
             <h2 className="text-2xl font-bold mb-4 text-center">Create Event</h2>
 
-            {error && <div className="alert alert-error mb-4">{error}</div>}
-            {success && <div className="alert alert-success mb-4">{success}</div>}
-
             <form onSubmit={handleSubmit} className="space-y-4">
-
-                <input
-                    type="text"
-                    name="title"
-                    placeholder="Event Title"
-                    value={formData.title}
-                    onChange={handleChange}
-                    className="input input-bordered w-full"
-                    required
-                />
-
-                <textarea
-                    name="description"
-                    placeholder="Description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    className="textarea textarea-bordered w-full"
-                />
-
-                <input
-                    type="date"
-                    name="eventDate"
-                    value={formData.eventDate}
-                    onChange={handleChange}
-                    className="input input-bordered w-full"
-                    required
-                />
-
-                <input
-                    type="time"
-                    name="time"
-                    value={formData.time}
-                    onChange={handleChange}
-                    className="input input-bordered w-full"
-                    required
-                />
-
-                <input
-                    type="text"
-                    name="location"
-                    placeholder="Location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    className="input input-bordered w-full"
-                    required
-                />
-
-                <label className="label">
-                    <span className="label-text">Registration Start Date & Time</span>
+                <label className="form-control w-full">
+                    <span className="label-text mb-1">Event Title</span>
+                    <input
+                        type="text"
+                        name="title"
+                        value={formData.title}
+                        onChange={handleChange}
+                        className="input input-bordered w-full"
+                        required
+                    />
                 </label>
-                <input
-                    type="datetime-local"
-                    name="registrationStartDate"
-                    value={formData.registrationStartDate}
-                    onChange={handleChange}
-                    className="input input-bordered w-full"
-                    required
-                />
 
-                <label className="label">
-                    <span className="label-text">Registration End Date & Time</span>
+                <label className="form-control w-full">
+                    <span className="label-text mb-1">Description</span>
+                    <textarea
+                        name="description"
+                        value={formData.description}
+                        onChange={handleChange}
+                        className="textarea textarea-bordered w-full"
+                    />
                 </label>
-                <input
-                    type="datetime-local"
-                    name="registrationEndDate"
-                    value={formData.registrationEndDate}
-                    onChange={handleChange}
-                    className="input input-bordered w-full"
-                    required
-                />
 
-                <input
-                    type="text"
-                    name="createdBy"
-                    placeholder="Created By"
-                    value={formData.createdBy}
-                    onChange={handleChange}
-                    className="input input-bordered w-full"
-                    required
-                />
+                <label className="form-control w-full">
+                    <span className="label-text mb-1">Event Date</span>
+                    <input
+                        type="date"
+                        name="eventDate"
+                        value={formData.eventDate}
+                        onChange={handleChange}
+                        className="input input-bordered w-full"
+                        required
+                    />
+                </label>
+
+                <label className="form-control w-full">
+                    <span className="label-text mb-1">Event Time</span>
+                    <input
+                        type="time"
+                        name="time"
+                        value={formData.time}
+                        onChange={handleChange}
+                        className="input input-bordered w-full"
+                        required
+                    />
+                </label>
+
+                <label className="form-control w-full">
+                    <span className="label-text mb-1">Location</span>
+                    <input
+                        type="text"
+                        name="location"
+                        value={formData.location}
+                        onChange={handleChange}
+                        className="input input-bordered w-full"
+                        required
+                    />
+                </label>
+
+                <label className="form-control w-full">
+                    <span className="label-text mb-1">Registration Start Date & Time</span>
+                    <input
+                        type="datetime-local"
+                        name="registrationStartDate"
+                        value={formData.registrationStartDate}
+                        onChange={handleChange}
+                        className="input input-bordered w-full"
+                        required
+                    />
+                </label>
+
+                <label className="form-control w-full">
+                    <span className="label-text mb-1">Registration End Date & Time</span>
+                    <input
+                        type="datetime-local"
+                        name="registrationEndDate"
+                        value={formData.registrationEndDate}
+                        onChange={handleChange}
+                        className="input input-bordered w-full"
+                        required
+                    />
+                </label>
+
+                <label className="form-control w-full">
+                    <span className="label-text mb-1">Created By</span>
+                    <input
+                        type="text"
+                        name="createdBy"
+                        value={formData.createdBy}
+                        onChange={handleChange}
+                        className="input input-bordered w-full"
+                        required
+                    />
+                </label>
 
                 <button type="submit" className="btn btn-primary w-full">
                     Create Event
                 </button>
+
+                {success && <div className="alert alert-success mt-4">{success}</div>}
+                {error && <div className="alert alert-error mt-4">{error}</div>}
             </form>
         </div>
     );
