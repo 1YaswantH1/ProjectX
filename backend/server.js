@@ -4,7 +4,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const module_alias = require('module-alias/register');
 
-dotenv.config({ path: path.resolve(__dirname, "../dotenv/config.env") });
+dotenv.config({ path: path.resolve(__dirname, "@/dotenv/config.env") });
 
 const Events = require("@/routes/eventRoutes");
 

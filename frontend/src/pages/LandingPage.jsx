@@ -22,7 +22,8 @@ export default function Home() {
             </div>
 
             <Link to="/createEvent">Go to create Event</Link>
-            <Link to="/allEvent">Go to All Event</Link>
+            <br />
+            <Link to="/AllEventsPage">Go to All Event</Link>
 
             <WhyUs />
             <Footer />
