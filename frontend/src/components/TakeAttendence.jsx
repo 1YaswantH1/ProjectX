@@ -13,11 +13,13 @@ export default function TakeAttendance() {
     const [showExportForm, setShowExportForm] = useState(false);
     const [exportStartDate, setExportStartDate] = useState("");
     const [exportEndDate, setExportEndDate] = useState("");
-
+    const VITE_API_CLASSES = import.meta.env.VITE_API_CLASSES;
+    const VITE_API_ATTENDANCE = import.meta.env.VITE_API_ATTENDANCE;
     const navigate = useNavigate();
 
     useEffect(() => {
         fetchClasses();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -38,13 +40,13 @@ export default function TakeAttendance() {
     };
 
     const fetchClasses = async () => {
-        const res = await fetch("http://localhost:3000/api/classes");
+        const res = await fetch(VITE_API_CLASSES);
         const data = await res.json();
         setClasses(data);
     };
 
     const loadStudents = async (name) => {
-        const res = await fetch("http://localhost:3000/api/classes");
+        const res = await fetch(VITE_API_CLASSES);
         const data = await res.json();
         const cls = data.find((c) => c.name === name);
         if (cls) {
@@ -57,7 +59,7 @@ export default function TakeAttendance() {
     const fetchAttendance = async (className, date) => {
         try {
             const res = await fetch(
-                `http://localhost:3000/api/attendance?className=${className}&date=${date}`
+                `${VITE_API_ATTENDANCE}?className=${className}&date=${date}`
             );
             if (!res.ok) return;
             const data = await res.json();

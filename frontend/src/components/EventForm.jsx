@@ -167,12 +167,12 @@ const EventForm = () => {
                     />
                 </label>
 
+                {success && <div className="alert alert-success mt-4">{success}</div>}
+                {error && <div className="alert alert-error mt-4">{error}</div>}
+
                 <button type="submit" className="btn btn-primary w-full">
                     Create Event
                 </button>
-
-                {success && <div className="alert alert-success mt-4">{success}</div>}
-                {error && <div className="alert alert-error mt-4">{error}</div>}
             </form>
         </div>
     );

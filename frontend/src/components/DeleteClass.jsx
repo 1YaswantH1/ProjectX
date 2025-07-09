@@ -6,10 +6,11 @@ export default function DeleteClass() {
     const [classes, setClasses] = useState([]);
     const [selectedClass, setSelectedClass] = useState(null);
     const [showModal, setShowModal] = useState(false);
-
+    const API_CLASSES_NAME = import.meta.env.VITE_API_CLASSES_NAME;
+    const API_CLASSES = import.meta.env.VITE_API_CLASSES;
     const fetchClasses = async () => {
         try {
-            const res = await axios.get("http://localhost:3000/api/classes");
+            const res = await axios.get(API_CLASSES);
             setClasses(res.data);
         } catch (error) {
             console.error("Failed to fetch classes:", error);
@@ -19,7 +20,7 @@ export default function DeleteClass() {
     const handleDelete = async () => {
         try {
             await axios.delete(
-                `http://localhost:3000/api/classes/name/${encodeURIComponent(selectedClass.name)}`
+                `${API_CLASSES_NAME}/${encodeURIComponent(selectedClass.name)}`
             );
             setShowModal(false);
             setSelectedClass(null);
@@ -79,10 +80,14 @@ export default function DeleteClass() {
                     <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
                         <h3 className="text-lg font-bold mb-2">Confirm Deletion</h3>
                         <p className="mb-4">
-                            Are you sure you want to delete class <strong>{selectedClass.name}</strong>?
+                            Are you sure you want to delete class{" "}
+                            <strong>{selectedClass.name}</strong>?
                         </p>
                         <div className="flex justify-end space-x-2">
-                            <button className="btn btn-outline" onClick={() => setShowModal(false)}>
+                            <button
+                                className="btn btn-outline"
+                                onClick={() => setShowModal(false)}
+                            >
                                 Cancel
                             </button>
                             <button className="btn btn-error" onClick={handleDelete}>

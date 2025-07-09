@@ -7,6 +7,7 @@ export default function CreateClass() {
     const [csvFile, setCsvFile] = useState(null);
     const [excelFile, setExcelFile] = useState(null);
     const [rollNumbersFromExcel, setRollNumbersFromExcel] = useState([]);
+    const API_CLASSES_UPLOAD = import.meta.env.VITE_API_CLASSES_UPLOAD;
     const navigate = useNavigate();
 
     const handleCSVUpload = async () => {
@@ -19,7 +20,7 @@ export default function CreateClass() {
         formData.append("csv", csvFile);
         formData.append("className", className);
 
-        const res = await fetch("http://localhost:3000/api/classes/upload", {
+        const res = await fetch(API_CLASSES_UPLOAD, {
             method: "POST",
             body: formData,
         });
@@ -115,7 +116,7 @@ export default function CreateClass() {
                     onClick={() => navigate("/attendance")}
                     className="btn btn-outline btn-sm"
                 >
-                    Already have a class? Take Attendance
+                    Take Attendance
                 </button>
             </div>
         </div>

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const attendanceRecordSchema = new mongoose.Schema({
     rollNumber: { type: String, required: true },
-    name: { type: String, required: true }, // ✅ Add this line
+    name: { type: String, required: true },
     status: { type: String, enum: ['present', 'absent'], required: true },
 });
 
