@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import NavBar from "./NavBar";
 
 export default function DeleteClass() {
     const [classes, setClasses] = useState([]);
@@ -34,6 +35,7 @@ export default function DeleteClass() {
 
     return (
         <div className="p-4">
+            <NavBar />
             <h2 className="text-2xl font-bold mb-4">Delete a Class</h2>
 
             {classes.length === 0 ? (

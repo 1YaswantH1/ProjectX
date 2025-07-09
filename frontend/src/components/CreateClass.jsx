@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
-
+import NavBar from "./NavBar";
 export default function CreateClass() {
     const [className, setClassName] = useState("");
     const [csvFile, setCsvFile] = useState(null);
@@ -61,6 +61,7 @@ export default function CreateClass() {
 
     return (
         <div className="max-w-xl mx-auto p-4 space-y-4">
+            <NavBar />
             <h1 className="text-3xl font-bold">🏫 Create or Import Class</h1>
 
             <input
