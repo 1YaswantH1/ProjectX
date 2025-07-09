@@ -6,6 +6,6 @@ const classController = require('../controllers/classController');
 
 router.post('/upload', upload.single('csv'), classController.uploadClassCSV);
 router.get('/', classController.getAllClasses);
-router.delete('/classes/:name', classController.deleteClass);
+router.delete('/name/:className', classController.deleteClassByName);
 
 module.exports = router;

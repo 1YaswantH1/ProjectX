@@ -5,6 +5,7 @@ import EventPage from "@/pages/EventsPage";
 import AllEventsPage from "@/pages/AllEventsPage";
 import Attendance from "@/components/TakeAttendence";
 import CreateClass from "@/components/CreateClass";
+import DeleteClass from "@/components/DeleteClass";
 import { Routes, Route } from "react-router-dom";
 
 function App() {
@@ -13,7 +14,8 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/createEvent" element={<EventPage />} />
       <Route path="/AllEventsPage" element={<AllEventsPage />} />
-      <Route path="/create" element={<CreateClass />} />
+      <Route path="/createClass" element={<CreateClass />} />
+      <Route path="/deleteClass" element={<DeleteClass />} />
       <Route path="/Attendance" element={<Attendance />} />
     </Routes>
   );

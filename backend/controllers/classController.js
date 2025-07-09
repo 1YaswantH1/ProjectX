@@ -69,13 +69,20 @@ exports.getAllClasses = async (req, res) => {
 };
 
 
-exports.deleteClass = async (req, res) => {
+exports.deleteClassByName = async (req, res) => {
     try {
-        const { name } = req.params;
-        await Class.deleteOne({ name });
-        res.json({ message: `Class ${name} deleted` });
+        const { className } = req.params;
+
+        const deletedClass = await Class.findOneAndDelete({ name: className });
+
+        if (!deletedClass) {
+            return res.status(404).json({ message: 'Class not found' });
+        }
+
+        res.json({ message: 'Class deleted successfully' });
     } catch (err) {
-        console.error(err);
+        console.error('Delete by name failed:', err);
         res.status(500).json({ error: 'Failed to delete class' });
     }
 };
+

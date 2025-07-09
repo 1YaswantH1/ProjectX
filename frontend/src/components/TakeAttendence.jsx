@@ -24,6 +24,7 @@ export default function TakeAttendance() {
         if (selectedClass) {
             fetchAttendance(selectedClass, date);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [date]);
 
     const showToast = (message, type = "info") => {
@@ -109,8 +110,13 @@ export default function TakeAttendance() {
             <div className="toast toast-top toast-end z-50" id="toast-container"></div>
 
             <div className="text-center mb-4">
-                <button onClick={() => navigate("/create")} className="btn btn-outline btn-sm">
+                <button onClick={() => navigate("/createClass")} className="btn btn-outline btn-sm">
                     Don't have a class? Create one
+                </button>
+            </div>
+            <div className="text-center mb-4">
+                <button onClick={() => navigate("/deleteClass")} className="btn btn-outline btn-sm">
+                    Delete Class
                 </button>
             </div>
 
