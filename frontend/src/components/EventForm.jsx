@@ -8,23 +8,28 @@ const EventForm = () => {
         eventDate: "",
         time: "",
         location: "",
+        registrationLink: "",
         registrationStartDate: "",
         registrationEndDate: "",
         createdBy: "",
     });
 
+    const [imageFile, setImageFile] = useState(null);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+
     const api_events = import.meta.env.VITE_API_EVENTS;
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
+        setFormData((prev) => ({ ...prev, [name]: value }));
         setError("");
         setSuccess("");
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        setImageFile(file);
     };
 
     const validateDates = () => {
@@ -47,11 +52,18 @@ const EventForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (!validateDates()) return;
 
+        const data = new FormData();
+        for (const key in formData) {
+            data.append(key, formData[key]);
+        }
+        if (imageFile) data.append("image", imageFile);
+
         try {
-            await axios.post(api_events, formData);
+            await axios.post(api_events, data, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
             setSuccess("Event created successfully!");
             setFormData({
                 title: "",
@@ -59,12 +71,14 @@ const EventForm = () => {
                 eventDate: "",
                 time: "",
                 location: "",
+                registrationLink: "",
                 registrationStartDate: "",
                 registrationEndDate: "",
                 createdBy: "",
             });
+            setImageFile(null);
         } catch (err) {
-            setError(err.response?.data?.error || "Something went wrong");
+            setError(err.response?.data?.message || "Something went wrong");
         }
     };
 
@@ -73,97 +87,47 @@ const EventForm = () => {
             <h2 className="text-2xl font-bold mb-4 text-center">Create Event</h2>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-                <label className="form-control w-full">
-                    <span className="label-text mb-1">Event Title</span>
-                    <input
-                        type="text"
-                        name="title"
-                        value={formData.title}
-                        onChange={handleChange}
-                        className="input input-bordered w-full"
-                        required
-                    />
-                </label>
+                {[
+                    { name: "title", label: "Event Title", type: "text" },
+                    { name: "description", label: "Description", type: "textarea" },
+                    { name: "eventDate", label: "Event Date", type: "date" },
+                    { name: "time", label: "Event Time", type: "time" },
+                    { name: "location", label: "Location", type: "text" },
+                    { name: "registrationLink", label: "Registration Link", type: "url" },
+                    { name: "registrationStartDate", label: "Registration Start", type: "datetime-local" },
+                    { name: "registrationEndDate", label: "Registration End", type: "datetime-local" },
+                    { name: "createdBy", label: "Created By", type: "text" },
+                ].map(({ name, label, type }) => (
+                    <label className="form-control w-full" key={name}>
+                        <span className="label-text mb-1">{label}</span>
+                        {type === "textarea" ? (
+                            <textarea
+                                name={name}
+                                value={formData[name]}
+                                onChange={handleChange}
+                                className="textarea textarea-bordered w-full"
+                            />
+                        ) : (
+                            <input
+                                type={type}
+                                name={name}
+                                value={formData[name]}
+                                onChange={handleChange}
+                                className="input input-bordered w-full"
+                                required={name !== "description" && name !== "registrationLink"}
+                            />
+                        )}
+                    </label>
+                ))}
 
+                {/* Image Upload */}
                 <label className="form-control w-full">
-                    <span className="label-text mb-1">Description</span>
-                    <textarea
-                        name="description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        className="textarea textarea-bordered w-full"
-                    />
-                </label>
-
-                <label className="form-control w-full">
-                    <span className="label-text mb-1">Event Date</span>
+                    <span className="label-text mb-1">Event Image</span>
                     <input
-                        type="date"
-                        name="eventDate"
-                        value={formData.eventDate}
-                        onChange={handleChange}
-                        className="input input-bordered w-full"
-                        required
-                    />
-                </label>
-
-                <label className="form-control w-full">
-                    <span className="label-text mb-1">Event Time</span>
-                    <input
-                        type="time"
-                        name="time"
-                        value={formData.time}
-                        onChange={handleChange}
-                        className="input input-bordered w-full"
-                        required
-                    />
-                </label>
-
-                <label className="form-control w-full">
-                    <span className="label-text mb-1">Location</span>
-                    <input
-                        type="text"
-                        name="location"
-                        value={formData.location}
-                        onChange={handleChange}
-                        className="input input-bordered w-full"
-                        required
-                    />
-                </label>
-
-                <label className="form-control w-full">
-                    <span className="label-text mb-1">Registration Start Date & Time</span>
-                    <input
-                        type="datetime-local"
-                        name="registrationStartDate"
-                        value={formData.registrationStartDate}
-                        onChange={handleChange}
-                        className="input input-bordered w-full"
-                        required
-                    />
-                </label>
-
-                <label className="form-control w-full">
-                    <span className="label-text mb-1">Registration End Date & Time</span>
-                    <input
-                        type="datetime-local"
-                        name="registrationEndDate"
-                        value={formData.registrationEndDate}
-                        onChange={handleChange}
-                        className="input input-bordered w-full"
-                        required
-                    />
-                </label>
-
-                <label className="form-control w-full">
-                    <span className="label-text mb-1">Created By</span>
-                    <input
-                        type="text"
-                        name="createdBy"
-                        value={formData.createdBy}
-                        onChange={handleChange}
-                        className="input input-bordered w-full"
-                        required
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="file-input file-input-bordered w-full"
                     />
                 </label>
 

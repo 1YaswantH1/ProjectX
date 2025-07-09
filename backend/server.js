@@ -17,12 +17,16 @@ const eventRoutes = require("@/routes/eventRoutes");
 const classRoutes = require("@/routes/classRoutes");
 const attendanceRoutes = require("@/routes/AttendanceRoutes");
 
-
+app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 
 // Middlewares
-app.use(cors({
+app.use(
+  cors({
     origin: "http://localhost:5173",
-}));
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  })
+);
 
 // app.options("*", cors());
 
@@ -34,9 +38,9 @@ app.use("/api/classes", classRoutes);
 app.use("/api/attendance", attendanceRoutes);
 
 app.get("/", (req, res) => {
-    res.send("hi");
+  res.send("hi");
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
