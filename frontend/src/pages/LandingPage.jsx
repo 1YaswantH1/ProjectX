@@ -24,6 +24,7 @@ export default function Home() {
             <Link to="/createEvent">Go to create Event</Link>
             <br />
             <Link to="/AllEventsPage">Go to All Event</Link>
+            <Link to="/Attendance">Attendance</Link>
 
             <WhyUs />
             <Footer />

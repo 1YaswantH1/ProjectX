@@ -2,35 +2,41 @@ const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const module_alias = require('module-alias/register');
+require("module-alias/register");
 
-dotenv.config({ path: path.resolve(__dirname, "@/dotenv/config.env") });
-
-const Events = require("@/routes/eventRoutes");
-
+dotenv.config({ path: path.join(__dirname, "dotenv/config.env") });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 const dbConnection = require("@/db_connection/db");
-const { events } = require("./models/eventModel");
 dbConnection();
 
-const corsOptions = {
-    origin: 'http://localhost:5173',
-    optionsSuccessStatus: 200
-}
+// Import Routes
+const eventRoutes = require("@/routes/eventRoutes");
+const classRoutes = require("@/routes/classRoutes");
+const attendanceRoutes = require("@/routes/AttendanceRoutes");
 
-app.use(cors(corsOptions));
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use("/api/events", Events)
 
+
+// Middlewares
+app.use(cors({
+    origin: "http://localhost:5173",
+}));
+
+// app.options("*", cors());
+
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+
+app.use("/api/events", eventRoutes);
+app.use("/api/classes", classRoutes);
+app.use("/api/attendance", attendanceRoutes);
 
 app.get("/", (req, res) => {
     res.send("hi");
 });
 
 app.listen(PORT, () => {
-    console.log(`Running on port number ${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });
