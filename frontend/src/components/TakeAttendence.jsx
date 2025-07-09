@@ -109,17 +109,6 @@ export default function TakeAttendance() {
         <div className="max-w-6xl mx-auto p-4 space-y-6">
             <div className="toast toast-top toast-end z-50" id="toast-container"></div>
 
-            <div className="text-center mb-4">
-                <button onClick={() => navigate("/createClass")} className="btn btn-outline btn-sm">
-                    Don't have a class? Create one
-                </button>
-            </div>
-            <div className="text-center mb-4">
-                <button onClick={() => navigate("/deleteClass")} className="btn btn-outline btn-sm">
-                    Delete Class
-                </button>
-            </div>
-
             <h1 className="text-3xl font-bold">📋 Take Attendance</h1>
 
             <div className="card bg-base-200 p-6">
@@ -292,6 +281,16 @@ export default function TakeAttendance() {
                         </button>
                     </div>
                 </div>
+            </div>
+            <div className="text-center mb-4">
+                <button onClick={() => navigate("/createClass")} className="btn btn-outline btn-sm">
+                    Create Class
+                </button>
+            </div>
+            <div className="text-center mb-4">
+                <button onClick={() => navigate("/deleteClass")} className="btn btn-outline btn-sm">
+                    Delete Class
+                </button>
             </div>
         </div>
     );

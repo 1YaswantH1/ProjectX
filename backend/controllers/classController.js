@@ -1,4 +1,6 @@
 const Class = require('../models/class');
+const Attendance = require('../models/Attendance');
+
 const csv = require('csv-parser');
 const fs = require('fs');
 
@@ -68,7 +70,6 @@ exports.getAllClasses = async (req, res) => {
     }
 };
 
-
 exports.deleteClassByName = async (req, res) => {
     try {
         const { className } = req.params;
@@ -79,10 +80,12 @@ exports.deleteClassByName = async (req, res) => {
             return res.status(404).json({ message: 'Class not found' });
         }
 
-        res.json({ message: 'Class deleted successfully' });
+        // Delete related attendance records
+        await Attendance.deleteMany({ className });
+
+        res.json({ message: 'Class and related attendance deleted successfully' });
     } catch (err) {
         console.error('Delete by name failed:', err);
-        res.status(500).json({ error: 'Failed to delete class' });
+        res.status(500).json({ error: 'Failed to delete class and attendance' });
     }
 };
-
