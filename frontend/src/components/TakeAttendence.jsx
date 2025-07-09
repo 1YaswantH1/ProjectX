@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from "react";
-import * as XLSX from "xlsx";
+import { useNavigate } from "react-router-dom";
 
-export default function Attendance() {
-    const [className, setClassName] = useState("");
-    const [csvFile, setCsvFile] = useState(null);
-    const [excelFile, setExcelFile] = useState(null);
+export default function TakeAttendance() {
     const [classes, setClasses] = useState([]);
     const [students, setStudents] = useState([]);
+    const [selectedClass, setSelectedClass] = useState("");
     const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
     const [attendance, setAttendance] = useState({});
-    const [selectedClass, setSelectedClass] = useState("");
     const [bulkStatus, setBulkStatus] = useState("present");
     const [bulkRollNumbers, setBulkRollNumbers] = useState("");
     const [filterText, setFilterText] = useState("");
@@ -17,9 +14,17 @@ export default function Attendance() {
     const [exportStartDate, setExportStartDate] = useState("");
     const [exportEndDate, setExportEndDate] = useState("");
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         fetchClasses();
     }, []);
+
+    useEffect(() => {
+        if (selectedClass) {
+            fetchAttendance(selectedClass, date);
+        }
+    }, [date]);
 
     const showToast = (message, type = "info") => {
         const container = document.getElementById("toast-container");
@@ -37,26 +42,6 @@ export default function Attendance() {
         setClasses(data);
     };
 
-    const handleCSVUpload = async () => {
-        if (!className || !csvFile) return showToast("Class name and file required", "warning");
-        const formData = new FormData();
-        formData.append("csv", csvFile);
-        formData.append("className", className);
-        const res = await fetch("http://localhost:3000/api/classes/upload", {
-            method: "POST",
-            body: formData,
-        });
-        const data = await res.json();
-        if (res.ok) {
-            showToast("Class uploaded successfully!", "success");
-            fetchClasses();
-            setClassName("");
-            setCsvFile(null);
-        } else {
-            showToast(data.message || "Upload failed", "error");
-        }
-    };
-
     const loadStudents = async (name) => {
         const res = await fetch("http://localhost:3000/api/classes");
         const data = await res.json();
@@ -64,27 +49,32 @@ export default function Attendance() {
         if (cls) {
             setStudents(cls.students);
             setSelectedClass(name);
-            setAttendance({});
+            fetchAttendance(name, date); // Load attendance
         }
     };
 
-    const handleExcelImport = () => {
-        if (!excelFile) return showToast("Please choose an Excel file", "warning");
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-            const data = new Uint8Array(evt.target.result);
-            const workbook = XLSX.read(data, { type: "array" });
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-            const rollNums = json
-                .flat()
-                .map(String)
-                .map((r) => r.trim())
-                .filter((r) => r);
-            setBulkRollNumbers(rollNums.join(","));
-            showToast(`Loaded ${rollNums.length} roll numbers from Excel`, "success");
-        };
-        reader.readAsArrayBuffer(excelFile);
+    const fetchAttendance = async (className, date) => {
+        try {
+            const res = await fetch(
+                `http://localhost:3000/api/attendance?className=${className}&date=${date}`
+            );
+            if (!res.ok) return;
+            const data = await res.json();
+
+            if (Array.isArray(data) && data.length > 0) {
+                const record = data[0];
+                const newAttendance = {};
+                record.records.forEach((r) => {
+                    newAttendance[r.rollNumber] = r.status;
+                });
+                setAttendance(newAttendance);
+                showToast("Loaded existing attendance", "info");
+            } else {
+                setAttendance({});
+            }
+        } catch (error) {
+            console.error("Failed to fetch attendance:", error);
+        }
     };
 
     const toggleStatus = (rollNumber, status) => {
@@ -118,41 +108,17 @@ export default function Attendance() {
     return (
         <div className="max-w-6xl mx-auto p-4 space-y-6">
             <div className="toast toast-top toast-end z-50" id="toast-container"></div>
-            <h1 className="text-3xl font-bold">📋 Attendance System</h1>
 
-            <div className="card bg-base-200 p-6 space-y-4">
-                <h2 className="text-xl font-semibold">Create or Import Students</h2>
-                <input
-                    type="text"
-                    className="input input-bordered w-full"
-                    placeholder="Class Name"
-                    value={className}
-                    onChange={(e) => setClassName(e.target.value)}
-                />
-                <input
-                    type="file"
-                    accept=".csv"
-                    className="file-input file-input-bordered w-full"
-                    onChange={(e) => setCsvFile(e.target.files[0])}
-                />
-                <button className="btn btn-success w-full" onClick={handleCSVUpload}>
-                    Upload Class CSV
+            <div className="text-center mb-4">
+                <button onClick={() => navigate("/create")} className="btn btn-outline btn-sm">
+                    👈 Don't have a class? Create one
                 </button>
-                <div className="flex gap-2 mt-4">
-                    <input
-                        type="file"
-                        accept=".xlsx, .xls"
-                        className="file-input file-input-bordered flex-1"
-                        onChange={(e) => setExcelFile(e.target.files[0])}
-                    />
-                    <button className="btn btn-info" onClick={handleExcelImport}>
-                        Import from Excel
-                    </button>
-                </div>
             </div>
 
+            <h1 className="text-3xl font-bold">📋 Take Attendance</h1>
+
             <div className="card bg-base-200 p-6">
-                <h2 className="text-xl font-semibold">Take Attendance</h2>
+                <h2 className="text-xl font-semibold">Select Class and Date</h2>
                 <div className="flex flex-col sm:flex-row gap-4 mt-2">
                     <select
                         className="select select-bordered w-full"
@@ -187,13 +153,15 @@ export default function Attendance() {
                             <option value="present">Present</option>
                             <option value="absent">Absent</option>
                         </select>
+
                         <input
                             type="text"
                             className="input input-bordered flex-1"
-                            placeholder="Comma-separated roll numbers (ex-100,101,102)"
+                            placeholder="Comma-separated roll numbers (e.g., 101,102,103)"
                             value={bulkRollNumbers}
                             onChange={(e) => setBulkRollNumbers(e.target.value)}
                         />
+
                         <button
                             className="btn btn-info"
                             onClick={() => {
@@ -204,13 +172,13 @@ export default function Attendance() {
                                 const statusMap = {};
                                 students.forEach((s) => {
                                     const match =
-                                        entries.includes(s.rollNumber) ||
-                                        entries.includes(s.rollNumber.slice(-3));
-                                    statusMap[s.rollNumber] = match
-                                        ? bulkStatus
-                                        : bulkStatus === "present"
-                                            ? "absent"
-                                            : "present";
+                                        entries.includes(s.rollNumber) || entries.includes(s.rollNumber.slice(-3));
+                                    statusMap[s.rollNumber] =
+                                        match
+                                            ? bulkStatus
+                                            : bulkStatus === "present"
+                                                ? "absent"
+                                                : "present";
                                 });
                                 setAttendance(statusMap);
                                 showToast(`Marked ${bulkStatus} for ${entries.length}, others inverted`, "success");
@@ -218,6 +186,7 @@ export default function Attendance() {
                         >
                             Mark Bulk
                         </button>
+
                         <input
                             type="text"
                             className="input input-bordered w-full sm:w-auto"
@@ -237,18 +206,14 @@ export default function Attendance() {
                             </div>
                             <div className="flex gap-2">
                                 <button
-                                    className={`btn btn-sm ${attendance[s.rollNumber] === "present"
-                                        ? "btn-success"
-                                        : "btn-outline"
+                                    className={`btn btn-sm ${attendance[s.rollNumber] === "present" ? "btn-success" : "btn-outline"
                                         }`}
                                     onClick={() => toggleStatus(s.rollNumber, "present")}
                                 >
                                     Present
                                 </button>
                                 <button
-                                    className={`btn btn-sm ${attendance[s.rollNumber] === "absent"
-                                        ? "btn-error"
-                                        : "btn-outline"
+                                    className={`btn btn-sm ${attendance[s.rollNumber] === "absent" ? "btn-error" : "btn-outline"
                                         }`}
                                     onClick={() => toggleStatus(s.rollNumber, "absent")}
                                 >
@@ -262,10 +227,7 @@ export default function Attendance() {
                         <button className="btn btn-primary w-full" onClick={submitAttendance}>
                             Submit Attendance
                         </button>
-                        <button
-                            className="btn btn-outline w-full"
-                            onClick={() => setShowExportForm(true)}
-                        >
+                        <button className="btn btn-outline w-full" onClick={() => setShowExportForm(true)}>
                             Export CSV
                         </button>
                         <button
@@ -281,7 +243,7 @@ export default function Attendance() {
                 </div>
             )}
 
-            {/* DaisyUI Modal for Export */}
+            {/* Export Modal */}
             <input type="checkbox" id="export-modal" className="modal-toggle" checked={showExportForm} readOnly />
             <div className="modal">
                 <div className="modal-box space-y-4">
