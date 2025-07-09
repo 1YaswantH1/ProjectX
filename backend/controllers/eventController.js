@@ -1,4 +1,31 @@
 const Event = require("../models/eventModel");
+const fs = require("fs");
+const path = require("path");
+
+const deleteEvent = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const event = await Event.findByIdAndDelete(id);
+
+        if (!event) return res.status(404).json({ message: "Event not found" });
+
+        // Fix path to match where Multer actually stores the file
+        if (event.imageUrl) {
+            const imagePath = path.resolve("uploads", path.basename(event.imageUrl));
+            fs.unlink(imagePath, (err) => {
+                if (err) {
+                    console.error("⚠️ Error deleting image file:", err.message);
+                } else {
+                    console.log("🗑️ Image file deleted:", imagePath);
+                }
+            });
+        }
+
+        res.status(200).json({ message: "Event and image deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
 
 // Create Event with local image upload support
 const createEvent = async (req, res) => {
@@ -48,20 +75,6 @@ const getAllEvents = async (req, res) => {
     }
 };
 
-// Delete Event by ID
-const deleteEvent = async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const event = await Event.findByIdAndDelete(id);
-        if (!event) return res.status(404).json({ message: "Event not found" });
-
-        res.status(200).json({ message: "Event deleted successfully" });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-};
-
 const updateEvent = async (req, res) => {
     try {
         const updatedEvent = await Event.findByIdAndUpdate(
@@ -69,7 +82,8 @@ const updateEvent = async (req, res) => {
             req.body,
             { new: true, runValidators: true }
         );
-        if (!updatedEvent) return res.status(404).json({ message: "Event not found" });
+        if (!updatedEvent)
+            return res.status(404).json({ message: "Event not found" });
         res.json(updatedEvent);
     } catch (error) {
         res.status(400).json({ message: error.message });
