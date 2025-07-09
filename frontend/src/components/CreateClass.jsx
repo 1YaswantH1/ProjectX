@@ -114,7 +114,7 @@ export default function CreateClass() {
                     onClick={() => navigate("/attendance")}
                     className="btn btn-outline btn-sm"
                 >
-                    ✅ Already have a class? Take Attendance
+                    Already have a class? Take Attendance
                 </button>
             </div>
         </div>

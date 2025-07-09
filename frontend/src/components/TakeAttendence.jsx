@@ -110,7 +110,7 @@ export default function TakeAttendance() {
 
             <div className="text-center mb-4">
                 <button onClick={() => navigate("/create")} className="btn btn-outline btn-sm">
-                    👈 Don't have a class? Create one
+                    Don't have a class? Create one
                 </button>
             </div>
 
