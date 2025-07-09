@@ -28,6 +28,7 @@ const deleteEvent = async (req, res) => {
 };
 
 // Create Event with local image upload support
+
 const createEvent = async (req, res) => {
     try {
         const {
@@ -41,6 +42,14 @@ const createEvent = async (req, res) => {
             registrationEndDate,
             createdBy,
         } = req.body;
+
+        // Define uploads folder path
+        const uploadDir = path.join(__dirname, "..", "uploads");
+
+        // Check and create uploads folder if not exists
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
 
         const imageUrl = req.file ? `/uploads/${req.file.filename}` : "";
 
