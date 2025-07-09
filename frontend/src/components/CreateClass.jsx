@@ -2,17 +2,25 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import NavBar from "./NavBar";
+
 export default function CreateClass() {
     const [className, setClassName] = useState("");
     const [csvFile, setCsvFile] = useState(null);
     const [excelFile, setExcelFile] = useState(null);
     const [rollNumbersFromExcel, setRollNumbersFromExcel] = useState([]);
+    const [statusMessage, setStatusMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+    const [excelModalOpen, setExcelModalOpen] = useState(false);
+
     const API_CLASSES_UPLOAD = import.meta.env.VITE_API_CLASSES_UPLOAD;
     const navigate = useNavigate();
 
     const handleCSVUpload = async () => {
+        setStatusMessage("");
+        setErrorMessage("");
+
         if (!className || !csvFile) {
-            alert("Please fill both fields");
+            setErrorMessage("Please fill both class name and choose a CSV file.");
             return;
         }
 
@@ -20,27 +28,35 @@ export default function CreateClass() {
         formData.append("csv", csvFile);
         formData.append("className", className);
 
-        const res = await fetch(API_CLASSES_UPLOAD, {
-            method: "POST",
-            body: formData,
-        });
-        const data = await res.json();
+        try {
+            const res = await fetch(API_CLASSES_UPLOAD, {
+                method: "POST",
+                body: formData,
+            });
 
-        if (res.ok) {
-            alert("Class uploaded successfully!");
-            setClassName("");
-            setCsvFile(null);
-            setExcelFile(null);
-            setRollNumbersFromExcel([]);
-            navigate("/attendance");
-        } else {
-            alert(data.message || "Upload failed");
+            const data = await res.json();
+
+            if (res.ok) {
+                setStatusMessage("✅ Class uploaded successfully!");
+                setClassName("");
+                setCsvFile(null);
+                setExcelFile(null);
+                setRollNumbersFromExcel([]);
+                setTimeout(() => navigate("/attendance"), 1000);
+            } else {
+                setErrorMessage(data.message || "❌ Upload failed.");
+            }
+        } catch (err) {
+            setErrorMessage("❌ Server error. Please try again later.", err);
         }
     };
 
     const handleExcelImport = () => {
+        setStatusMessage("");
+        setErrorMessage("");
+
         if (!excelFile) {
-            alert("Please choose an Excel file");
+            setErrorMessage("Please choose an Excel file.");
             return;
         }
 
@@ -50,13 +66,16 @@ export default function CreateClass() {
             const workbook = XLSX.read(data, { type: "array" });
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
             const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
             const flatRolls = json
                 .flat()
                 .map((v) => String(v).trim())
                 .filter((v) => v !== "");
+
             setRollNumbersFromExcel(flatRolls);
-            alert(`Imported ${flatRolls.length} roll numbers`);
+            setExcelModalOpen(true);
         };
+
         reader.readAsArrayBuffer(excelFile);
     };
 
@@ -83,6 +102,17 @@ export default function CreateClass() {
             <button className="btn btn-success w-full" onClick={handleCSVUpload}>
                 Upload Class CSV
             </button>
+
+            {statusMessage && (
+                <div className="alert alert-success mt-2 py-2 text-sm">
+                    {statusMessage}
+                </div>
+            )}
+            {errorMessage && (
+                <div className="alert alert-error mt-2 py-2 text-sm">
+                    {errorMessage}
+                </div>
+            )}
 
             <div className="divider">OR</div>
 
@@ -119,6 +149,31 @@ export default function CreateClass() {
                     Take Attendance
                 </button>
             </div>
+
+            {/* Excel Modal */}
+            {excelModalOpen && (
+                <dialog
+                    open
+                    className="modal modal-open"
+                    onClick={() => setExcelModalOpen(false)}
+                >
+                    <div className="modal-box">
+                        <h3 className="font-bold text-lg">✅ Excel Imported!</h3>
+                        <p className="py-2">
+                            Imported <strong>{rollNumbersFromExcel.length}</strong> roll
+                            numbers from Excel.
+                        </p>
+                        <div className="modal-action">
+                            <button
+                                className="btn"
+                                onClick={() => setExcelModalOpen(false)}
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </dialog>
+            )}
         </div>
     );
 }
