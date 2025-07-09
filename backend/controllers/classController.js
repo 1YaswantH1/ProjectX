@@ -1,6 +1,5 @@
 const Class = require("../models/class");
 const Attendance = require("../models/Attendance");
-
 const csv = require("csv-parser");
 const fs = require("fs");
 
@@ -24,6 +23,7 @@ exports.uploadClassCSV = async (req, res) => {
                 const missing = requiredHeaders.filter((h) => !headers.includes(h));
                 if (missing.length > 0) {
                     csvStream.destroy(); // stop reading
+                    if (fs.existsSync(filePath)) fs.unlinkSync(filePath); // delete file
                     return res
                         .status(400)
                         .json({ error: `Missing required headers: ${missing.join(", ")}` });
@@ -42,15 +42,21 @@ exports.uploadClassCSV = async (req, res) => {
                 });
             })
             .on("end", async () => {
-                if (!headerValidated) return; // already handled error
+                if (!headerValidated) {
+                    if (fs.existsSync(filePath)) fs.unlinkSync(filePath); // cleanup
+                    return;
+                }
 
                 const existing = await Class.findOne({ name: className });
                 if (existing) {
+                    if (fs.existsSync(filePath)) fs.unlinkSync(filePath); // cleanup
                     return res.status(400).json({ message: "Class already exists." });
                 }
 
                 const newClass = new Class({ name: className, students });
                 await newClass.save();
+
+                if (fs.existsSync(filePath)) fs.unlinkSync(filePath); // ✅ delete uploaded file
 
                 res.json({
                     message: "Class uploaded successfully",
@@ -59,10 +65,14 @@ exports.uploadClassCSV = async (req, res) => {
             })
             .on("error", (err) => {
                 console.error("CSV parsing error:", err);
+                if (fs.existsSync(filePath)) fs.unlinkSync(filePath); // ✅ cleanup
                 res.status(500).json({ error: "CSV parsing failed" });
             });
     } catch (err) {
         console.error("Upload failed:", err);
+        if (req.file?.path && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path); // ✅ cleanup
+        }
         res.status(500).json({ error: "Upload failed" });
     }
 };
@@ -87,7 +97,7 @@ exports.deleteClassByName = async (req, res) => {
             return res.status(404).json({ message: "Class not found" });
         }
 
-        // Delete related attendance records
+        // ✅ Delete related attendance records
         await Attendance.deleteMany({ className });
 
         res.json({ message: "Class and related attendance deleted successfully" });
