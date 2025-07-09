@@ -49,7 +49,7 @@ export default function TakeAttendance() {
         if (cls) {
             setStudents(cls.students);
             setSelectedClass(name);
-            fetchAttendance(name, date); // Load attendance
+            fetchAttendance(name, date);
         }
     };
 
@@ -60,7 +60,6 @@ export default function TakeAttendance() {
             );
             if (!res.ok) return;
             const data = await res.json();
-
             if (Array.isArray(data) && data.length > 0) {
                 const record = data[0];
                 const newAttendance = {};
@@ -73,7 +72,7 @@ export default function TakeAttendance() {
                 setAttendance({});
             }
         } catch (error) {
-            console.error("Failed to fetch attendance:", error);
+            console.error("Error fetching attendance:", error);
         }
     };
 
@@ -157,7 +156,7 @@ export default function TakeAttendance() {
                         <input
                             type="text"
                             className="input input-bordered flex-1"
-                            placeholder="Comma-separated roll numbers (e.g., 101,102,103)"
+                            placeholder="Comma-separated roll numbers (e.g., 101,102)"
                             value={bulkRollNumbers}
                             onChange={(e) => setBulkRollNumbers(e.target.value)}
                         />
@@ -172,7 +171,8 @@ export default function TakeAttendance() {
                                 const statusMap = {};
                                 students.forEach((s) => {
                                     const match =
-                                        entries.includes(s.rollNumber) || entries.includes(s.rollNumber.slice(-3));
+                                        entries.includes(s.rollNumber) ||
+                                        entries.includes(s.rollNumber.slice(-3));
                                     statusMap[s.rollNumber] =
                                         match
                                             ? bulkStatus
@@ -201,9 +201,7 @@ export default function TakeAttendance() {
                             key={s.rollNumber}
                             className="flex justify-between items-center border rounded p-4"
                         >
-                            <div>
-                                {s.rollNumber} - {s.name}
-                            </div>
+                            <div>{s.rollNumber} - {s.name}</div>
                             <div className="flex gap-2">
                                 <button
                                     className={`btn btn-sm ${attendance[s.rollNumber] === "present" ? "btn-success" : "btn-outline"

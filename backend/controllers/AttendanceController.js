@@ -4,7 +4,6 @@ exports.addAttendance = async (req, res) => {
     try {
         const { className, date, records } = req.body;
 
-        // Update if exists, else insert
         const existing = await Attendance.findOne({ className, date });
         if (existing) {
             existing.records = records;
@@ -25,7 +24,12 @@ exports.getAttendanceByClassAndDate = async (req, res) => {
         const { className, date } = req.query;
         const filter = {};
         if (className) filter.className = className;
-        if (date) filter.date = new Date(date);
+        if (date) {
+            const d = new Date(date);
+            const next = new Date(d);
+            next.setDate(d.getDate() + 1);
+            filter.date = { $gte: d, $lt: next };
+        }
         const data = await Attendance.find(filter);
         res.json(data);
     } catch (err) {
@@ -41,7 +45,7 @@ exports.exportAttendanceCSV = async (req, res) => {
 
         const start = new Date(startDate);
         const end = new Date(endDate);
-        end.setDate(end.getDate() + 1); // include end date
+        end.setDate(end.getDate() + 1);
 
         const records = await Attendance.find({
             className,
@@ -54,7 +58,6 @@ exports.exportAttendanceCSV = async (req, res) => {
         const dates = [...new Set(records.map(r => r.date.toISOString().slice(0, 10)))].sort();
 
         const studentMap = {};
-
         for (const entry of records) {
             const dateStr = entry.date.toISOString().slice(0, 10);
             for (const rec of entry.records) {
@@ -67,7 +70,6 @@ exports.exportAttendanceCSV = async (req, res) => {
 
         const header = ['Roll Number', 'Name', ...dates];
         const rows = [header.join(',')];
-
         for (const [rollNumber, { name, statuses }] of Object.entries(studentMap)) {
             const row = [rollNumber, `"${name}"`];
             for (const date of dates) {
