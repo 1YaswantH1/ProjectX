@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
-import NavBar from "./NavBar";
+import NavBar from "@/components/NavBar";
 
 export default function CreateClass() {
     const [className, setClassName] = useState("");

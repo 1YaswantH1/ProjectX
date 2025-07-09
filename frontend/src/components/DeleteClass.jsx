@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import NavBar from "./NavBar";
+import NavBar from "@/components/NavBar";
+import { useNavigate } from "react-router-dom";
+
 
 export default function DeleteClass() {
+    const navigate = useNavigate();
     const [classes, setClasses] = useState([]);
     const [selectedClass, setSelectedClass] = useState(null);
     const [showModal, setShowModal] = useState(false);
@@ -98,6 +101,14 @@ export default function DeleteClass() {
                     </div>
                 </div>
             )}
+            <div className="text-center mt-4">
+                <button
+                    onClick={() => navigate("/attendance")}
+                    className="btn btn-outline btn-sm"
+                >
+                    Take Attendance
+                </button>
+            </div>
         </div>
     );
 }
