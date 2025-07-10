@@ -77,7 +77,7 @@ const createEvent = async (req, res) => {
 const getAllEvents = async (req, res) => {
     try {
         const events = await Event.find();
-        console.log("✅ Fetched events");
+        // console.log("✅ Fetched events");
         res.json(events);
     } catch (err) {
         res.status(500).json({ message: err.message });

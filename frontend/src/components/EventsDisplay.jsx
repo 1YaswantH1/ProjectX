@@ -10,6 +10,7 @@ const EventsDisplay = () => {
   const editModalRef = useRef(null);
 
   const api_events = import.meta.env.VITE_API_EVENTS;
+  const api = import.meta.env.VITE_API;
 
   useEffect(() => {
     fetchEvents();
@@ -67,67 +68,75 @@ const EventsDisplay = () => {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
         {events.map((event) => (
           <div
             key={event._id}
-            className="card bg-base-100 shadow-md border border-gray-200 rounded-xl p-5"
+            className="flex flex-col md:flex-row bg-base-100 shadow-md border border-gray-200 rounded-xl overflow-hidden"
           >
             {event.imageUrl && (
               <img
-                src={`http://localhost:3000${event.imageUrl}`}
+                src={`${api}${event.imageUrl}`}
                 alt="Event"
-                className="w-full h-48 object-cover rounded-md mb-3"
+                className="w-full md:w-[45%] h-48 md:h-full object-contain bg-white"
               />
             )}
 
-            <div className="flex justify-between items-center mb-3">
-              <h2 className="text-xl font-semibold">{event.title}</h2>
-              <div className="space-x-2">
-                <button
-                  onClick={() => openEditModal(event)}
-                  className="btn btn-sm btn-outline btn-primary"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => openDeleteModal(event._id)}
-                  className="btn btn-sm btn-outline btn-error"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
+            <div className="flex flex-col p-5 justify-between flex-1">
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <h2 className="text-xl font-semibold">{event.title}</h2>
+                  <div className="space-x-2">
+                    <button
+                      onClick={() => openEditModal(event)}
+                      className="btn btn-sm btn-outline btn-primary"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => openDeleteModal(event._id)}
+                      className="btn btn-sm btn-outline btn-error"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
 
-            <p className="text-gray-700 mb-2">{event.description}</p>
-            <p className="text-sm text-gray-600">
-              <strong>Date:</strong>{" "}
-              {new Date(event.eventDate).toLocaleDateString()}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Time:</strong> {event.time}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Location:</strong> {event.location}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Registration:</strong>{" "}
-              {new Date(event.registrationStartDate).toLocaleString()} →{" "}
-              {new Date(event.registrationEndDate).toLocaleString()}
-            </p>
-            <p className="text-sm text-gray-500 mt-2">
-              Created by: {event.createdBy}
-            </p>
-            {event.registrationLink && (
-              <a
-                href={event.registrationLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-sm btn-primary mt-3"
-              >
-                Register Here
-              </a>
-            )}
+                <p className="text-gray-700 mb-2 max-h-24 overflow-y-auto pr-2">
+                  {event.description}
+                </p>
+
+                <p className="text-sm text-gray-600">
+                  <strong>Date:</strong>{" "}
+                  {new Date(event.eventDate).toLocaleDateString()}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <strong>Time:</strong> {event.time}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <strong>Location:</strong> {event.location}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <strong>Registration:</strong>{" "}
+                  {new Date(event.registrationStartDate).toLocaleString()} →{" "}
+                  {new Date(event.registrationEndDate).toLocaleString()}
+                </p>
+                <p className="text-sm text-gray-500 mt-2">
+                  Created by: {event.createdBy}
+                </p>
+              </div>
+
+              {event.registrationLink && (
+                <a
+                  href={event.registrationLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-sm btn-primary mt-4 self-start"
+                >
+                  Register Here
+                </a>
+              )}
+            </div>
           </div>
         ))}
       </div>
