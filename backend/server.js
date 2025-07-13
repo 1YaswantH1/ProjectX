@@ -16,6 +16,7 @@ dbConnection();
 const eventRoutes = require("@/routes/eventRoutes");
 const classRoutes = require("@/routes/classRoutes");
 const attendanceRoutes = require("@/routes/AttendanceRoutes");
+const authRoutes = require("@/routes/AuthRoutes")
 
 app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 
@@ -36,6 +37,7 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use("/api/events", eventRoutes);
 app.use("/api/classes", classRoutes);
 app.use("/api/attendance", attendanceRoutes);
+app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
   res.send("hi");
