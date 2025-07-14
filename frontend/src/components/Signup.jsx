@@ -7,8 +7,10 @@ const Signup = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [profileImage, setProfileImage] = useState(null);
-    const [preview, setPreview] = useState('images/profile.png');
+    const [preview, setPreview] = useState('/images/default-profile.png');
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [zoom, setZoom] = useState(1);
     const navigate = useNavigate();
 
     const handleImageChange = (e) => {
@@ -17,12 +19,15 @@ const Signup = () => {
         if (file) {
             setPreview(URL.createObjectURL(file));
         } else {
-            setPreview('images/profile.png');
+            setPreview('/images/default-profile.png');
         }
     };
 
     const handleSignup = async (e) => {
         e.preventDefault();
+        setError('');
+        setSuccess('');
+
         const formData = new FormData();
         formData.append('username', username);
         formData.append('email', email);
@@ -32,12 +37,13 @@ const Signup = () => {
         }
 
         try {
-            // eslint-disable-next-line no-unused-vars
-            const response = await axios.post('http://localhost:3000/api/auth/signup', formData, {
+            const res = await axios.post('http://localhost:3000/api/auth/signup', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            alert('Signup successful! Please log in.');
-            navigate('/login');
+
+            localStorage.setItem('user', JSON.stringify(res.data.user)); // ✅ Save user info
+            setSuccess('Signup successful! Redirecting...');
+            setTimeout(() => navigate('/'), 1500);
         } catch (err) {
             setError(err.response?.data?.message || 'Signup failed');
         }
@@ -49,7 +55,10 @@ const Signup = () => {
                 <div className="card w-96 bg-base-100 shadow-xl">
                     <div className="card-body">
                         <h2 className="card-title">Sign Up</h2>
+
                         {error && <div className="alert alert-error">{error}</div>}
+                        {success && <div className="alert alert-success">{success}</div>}
+
                         <form onSubmit={handleSignup}>
                             <div className="form-control">
                                 <label className="label">
@@ -63,6 +72,7 @@ const Signup = () => {
                                     required
                                 />
                             </div>
+
                             <div className="form-control">
                                 <label className="label">
                                     <span className="label-text">Email</span>
@@ -75,6 +85,7 @@ const Signup = () => {
                                     required
                                 />
                             </div>
+
                             <div className="form-control">
                                 <label className="label">
                                     <span className="label-text">Password</span>
@@ -87,6 +98,7 @@ const Signup = () => {
                                     required
                                 />
                             </div>
+
                             <div className="form-control">
                                 <label className="label">
                                     <span className="label-text">Profile Image</span>
@@ -97,12 +109,38 @@ const Signup = () => {
                                     onChange={handleImageChange}
                                     className="file-input file-input-bordered w-full"
                                 />
-                                <img src={preview} alt="Profile Preview" className="mt-4 w-24 h-24 rounded-full mx-auto" />
+                                <div className="flex flex-col items-center mt-4">
+                                    <div className="overflow-hidden rounded-full border shadow-md w-16 h-16 flex items-center justify-center">
+                                        <img
+                                            src={preview}
+                                            alt="Profile Preview"
+                                            className="transition-transform duration-300"
+                                            style={{
+                                                transform: `scale(${zoom})`,
+                                                objectFit: 'cover',
+                                                width: '100%',
+                                                height: '100%',
+                                            }}
+                                        />
+                                    </div>
+                                    <input
+                                        type="range"
+                                        min="0.5"
+                                        max="2"
+                                        step="0.1"
+                                        value={zoom}
+                                        onChange={(e) => setZoom(parseFloat(e.target.value))}
+                                        className="range mt-2 w-24"
+                                        title="Zoom"
+                                    />
+                                </div>
                             </div>
+
                             <div className="card-actions justify-end mt-4">
                                 <button type="submit" className="btn btn-primary">Sign Up</button>
                             </div>
                         </form>
+
                         <p className="mt-4">
                             Already have an account? <Link to="/login" className="link link-primary">Login</Link>
                         </p>

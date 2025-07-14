@@ -6,15 +6,18 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setError('');
+        setSuccess('');
         try {
-            // eslint-disable-next-line no-unused-vars
-            const response = await axios.post('http://localhost:3000/api/auth/login', { email, password });
-            alert('Login successful!');
-            navigate('/');
+            const res = await axios.post('http://localhost:3000/api/auth/login', { email, password });
+            localStorage.setItem('user', JSON.stringify(res.data.user)); // ✅ Save user info
+            setSuccess('Login successful! Redirecting...');
+            setTimeout(() => navigate('/'), 1500);
         } catch (err) {
             setError(err.response?.data?.message || 'Login failed');
         }
@@ -26,7 +29,10 @@ const Login = () => {
                 <div className="card w-96 bg-base-100 shadow-xl">
                     <div className="card-body">
                         <h2 className="card-title">Login</h2>
+
                         {error && <div className="alert alert-error">{error}</div>}
+                        {success && <div className="alert alert-success">{success}</div>}
+
                         <form onSubmit={handleLogin}>
                             <div className="form-control">
                                 <label className="label">

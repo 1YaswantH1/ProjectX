@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const session = require('express-session');
 require("module-alias/register");
 
 dotenv.config({ path: path.join(__dirname, "dotenv/config.env") });
@@ -17,8 +18,7 @@ const eventRoutes = require("@/routes/eventRoutes");
 const classRoutes = require("@/routes/classRoutes");
 const attendanceRoutes = require("@/routes/AttendanceRoutes");
 const authRoutes = require("@/routes/AuthRoutes")
-
-app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Middlewares
 app.use(
@@ -33,6 +33,18 @@ app.use(
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+
+app.use(session({
+  secret: 'your_secret_key',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // set to true if using https
+}));
+
+app.use((req, res, next) => {
+  console.log('Session details:', req.session);
+  next();
+});
 
 app.use("/api/events", eventRoutes);
 app.use("/api/classes", classRoutes);

@@ -16,6 +16,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.post('/signup', upload.single('profileImage'), authController.signup);
+router.post('/logout', authController.logout);
+
 router.post('/login', authController.login);
 
 module.exports = router;
