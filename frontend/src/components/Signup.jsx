@@ -79,6 +79,7 @@ const Signup = () => {
         if (originalImage) {
             processImage(originalImage, zoom);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [zoom]);
 
     const handleSignup = async (e) => {
