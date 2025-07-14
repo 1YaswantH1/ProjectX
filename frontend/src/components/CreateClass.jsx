@@ -12,6 +12,7 @@ export default function CreateClass() {
         if (!user) {
             navigate("/login");
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const [className, setClassName] = useState("");
