@@ -7,8 +7,6 @@ const {
   deleteEvent,
   updateEvent,
 } = require("@/controllers/eventController");
-const isAuthenticated = require('@/middlewares/auth');
-
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
