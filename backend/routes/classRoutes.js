@@ -3,9 +3,11 @@ const router = express.Router();
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 const classController = require('../controllers/classController');
+const isAuthenticated = require('@/middlewares/auth');
 
-router.post('/upload', upload.single('csv'), classController.uploadClassCSV);
-router.get('/', classController.getAllClasses);
-router.delete('/name/:className', classController.deleteClassByName);
+
+router.post('/upload', isAuthenticated, upload.single('csv'), classController.uploadClassCSV);
+router.get('/', isAuthenticated, classController.getAllClasses);
+router.delete('/name/:className', isAuthenticated, classController.deleteClassByName);
 
 module.exports = router;

@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const attendanceController = require('../controllers/attendanceController');
+const attendanceController = require('@/controllers/attendanceController');
+const isAuthenticated = require('@/middlewares/auth');
 
-router.post('/', attendanceController.addAttendance);
-router.get('/', attendanceController.getAttendanceByClassAndDate);
-router.get('/export-pivot', attendanceController.exportAttendanceCSV);
+
+router.post('/', isAuthenticated, attendanceController.addAttendance);
+router.get('/', isAuthenticated, attendanceController.getAttendanceByClassAndDate);
+router.get('/export-pivot', isAuthenticated, attendanceController.exportAttendanceCSV);
 
 module.exports = router;

@@ -7,6 +7,8 @@ const {
   deleteEvent,
   updateEvent,
 } = require("@/controllers/eventController");
+const isAuthenticated = require('@/middlewares/auth');
+
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -18,9 +20,9 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-router.post("/", upload.single("image"), createEvent);
+router.post("/", isAuthenticated, upload.single("image"), createEvent);
 router.get("/", getAllEvents);
-router.delete("/:id", deleteEvent);
-router.put("/:id", updateEvent);
+router.delete("/:id", isAuthenticated, deleteEvent);
+router.put("/:id", isAuthenticated, updateEvent);
 
 module.exports = router;
