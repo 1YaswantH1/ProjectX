@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -8,6 +8,7 @@ const Signup = () => {
     const [password, setPassword] = useState('');
     const [profileImage, setProfileImage] = useState(null);
     const [preview, setPreview] = useState('/images/default-profile.png');
+    const [originalImage, setOriginalImage] = useState(null);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [zoom, setZoom] = useState(1);
@@ -15,13 +16,70 @@ const Signup = () => {
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        setProfileImage(file);
-        if (file) {
-            setPreview(URL.createObjectURL(file));
-        } else {
-            setPreview('/images/default-profile.png');
-        }
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+
+        reader.onload = () => {
+            const img = new Image();
+            img.src = reader.result;
+
+            img.onload = () => {
+                setOriginalImage(img); // Save original image
+                processImage(img, zoom, file); // Initial processing
+            };
+
+            img.onerror = () => {
+                setError("Failed to load image for preview.");
+            };
+        };
+
+        reader.onerror = () => {
+            setError("Failed to read file.");
+        };
     };
+
+    const processImage = (img, currentZoom, originalFile) => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const size = Math.min(img.width, img.height);
+        canvas.width = size;
+        canvas.height = size;
+
+        const offsetX = (img.width - size) / 2;
+        const offsetY = (img.height - size) / 2;
+
+        ctx.drawImage(
+            img,
+            offsetX + (size / 2) * (1 - currentZoom),
+            offsetY + (size / 2) * (1 - currentZoom),
+            size * currentZoom,
+            size * currentZoom,
+            0,
+            0,
+            size,
+            size
+        );
+
+        canvas.toBlob((blob) => {
+            if (!blob) {
+                setError("Failed to process image.");
+                return;
+            }
+
+            const zoomedFile = new File([blob], originalFile?.name || 'profile.jpg', { type: blob.type });
+            setProfileImage(zoomedFile);
+            setPreview(URL.createObjectURL(blob));
+        }, originalFile?.type || 'image/jpeg');
+    };
+
+    useEffect(() => {
+        if (originalImage) {
+            processImage(originalImage, zoom);
+        }
+    }, [zoom]);
 
     const handleSignup = async (e) => {
         e.preventDefault();
@@ -41,7 +99,7 @@ const Signup = () => {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
 
-            localStorage.setItem('user', JSON.stringify(res.data.user)); // ✅ Save user info
+            localStorage.setItem('user', JSON.stringify(res.data.user));
             setSuccess('Signup successful! Redirecting...');
             setTimeout(() => navigate('/'), 1500);
         } catch (err) {
@@ -116,7 +174,6 @@ const Signup = () => {
                                             alt="Profile Preview"
                                             className="transition-transform duration-300"
                                             style={{
-                                                transform: `scale(${zoom})`,
                                                 objectFit: 'cover',
                                                 width: '100%',
                                                 height: '100%',

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ThemeChanger from "./ThemeChanger";
+import ThemeChanger from "@/components/ThemeChanger";
 
 export default function NavBar() {
   const [user, setUser] = useState(null);
@@ -22,7 +22,7 @@ export default function NavBar() {
   return (
     <div className="navbar bg-base-100 px-6 shadow-md">
       <div className="flex-1">
-        <span className="text-xl font-bold">ProjectX</span>
+        <span className="text-xl font-bold cursor-pointer" onClick={() => navigate('/')}>ProjectX</span>
       </div>
 
       <div className="flex items-center gap-4">
@@ -41,7 +41,8 @@ export default function NavBar() {
             </div>
             <span className="font-medium text-base">{user.username}</span>
             <button
-              className="btn btn-sm btn-outline btn-error"
+              className="btn bg-red-600 hover:bg-red-700 text-white"
+              // className="btn btn-sm btn-outline "
               onClick={handleLogout}
             >
               Logout
