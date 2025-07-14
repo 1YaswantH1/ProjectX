@@ -11,6 +11,7 @@ export default function DeleteClass() {
         if (!user) {
             navigate("/login");
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     const [classes, setClasses] = useState([]);
     const [selectedClass, setSelectedClass] = useState(null);
