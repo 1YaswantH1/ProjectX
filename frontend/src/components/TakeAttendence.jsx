@@ -2,6 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function TakeAttendance() {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const user = localStorage.getItem("user"); // adjust if you're using tokens or session
+        if (!user) {
+            navigate("/login");
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     const [classes, setClasses] = useState([]);
     const [students, setStudents] = useState([]);
     const [selectedClass, setSelectedClass] = useState("");
@@ -15,7 +24,6 @@ export default function TakeAttendance() {
     const [exportEndDate, setExportEndDate] = useState("");
     const VITE_API_CLASSES = import.meta.env.VITE_API_CLASSES;
     const VITE_API_ATTENDANCE = import.meta.env.VITE_API_ATTENDANCE;
-    const navigate = useNavigate();
 
     useEffect(() => {
         fetchClasses();

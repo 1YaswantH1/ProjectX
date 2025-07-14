@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const EventForm = () => {
     const [formData, setFormData] = useState({
@@ -13,6 +15,14 @@ const EventForm = () => {
         registrationEndDate: "",
         createdBy: "",
     });
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const user = localStorage.getItem("user"); // adjust if you're using tokens or session
+        if (!user) {
+            navigate("/login");
+        }
+    }, []);
 
     const [imageFile, setImageFile] = useState(null);
     const [error, setError] = useState("");

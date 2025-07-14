@@ -41,11 +41,6 @@ app.use(session({
   cookie: { secure: false } // set to true if using https
 }));
 
-app.use((req, res, next) => {
-  console.log('Session details:', req.session);
-  next();
-});
-
 app.use("/api/events", eventRoutes);
 app.use("/api/classes", classRoutes);
 app.use("/api/attendance", attendanceRoutes);

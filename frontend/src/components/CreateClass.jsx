@@ -2,8 +2,18 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 import NavBar from "@/components/NavBar";
+import { useEffect } from "react";
 
 export default function CreateClass() {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const user = localStorage.getItem("user"); // adjust if you're using tokens or session
+        if (!user) {
+            navigate("/login");
+        }
+    }, []);
+
     const [className, setClassName] = useState("");
     const [csvFile, setCsvFile] = useState(null);
     const [excelFile, setExcelFile] = useState(null);
@@ -13,7 +23,6 @@ export default function CreateClass() {
     const [excelModalOpen, setExcelModalOpen] = useState(false);
 
     const API_CLASSES_UPLOAD = import.meta.env.VITE_API_CLASSES_UPLOAD;
-    const navigate = useNavigate();
 
     const handleCSVUpload = async () => {
         setStatusMessage("");
