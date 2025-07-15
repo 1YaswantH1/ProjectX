@@ -24,6 +24,14 @@ const EventForm = () => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const stored = localStorage.getItem("user");
+        if (stored) {
+            setUser(JSON.parse(stored));
+        }
+    }, []);
 
     const [imageFile, setImageFile] = useState(null);
     const [error, setError] = useState("");
@@ -67,7 +75,12 @@ const EventForm = () => {
 
         const data = new FormData();
         for (const key in formData) {
-            data.append(key, formData[key]);
+            // Set createdBy from user context if available
+            if (key === "createdBy") {
+                data.append("createdBy", user?.email || "");
+            } else {
+                data.append(key, formData[key]);
+            }
         }
         if (imageFile) data.append("image", imageFile);
 
@@ -85,7 +98,7 @@ const EventForm = () => {
                 registrationLink: "",
                 registrationStartDate: "",
                 registrationEndDate: "",
-                createdBy: "",
+                createdBy: user?.email || "",
             });
             setImageFile(null);
         } catch (err) {
@@ -106,8 +119,7 @@ const EventForm = () => {
                     { name: "location", label: "Location", type: "text" },
                     { name: "registrationLink", label: "Registration Link", type: "url" },
                     { name: "registrationStartDate", label: "Registration Start", type: "datetime-local" },
-                    { name: "registrationEndDate", label: "Registration End", type: "datetime-local" },
-                    { name: "createdBy", label: "Created By", type: "text" },
+                    { name: "registrationEndDate", label: "Registration End", type: "datetime-local" }
                 ].map(({ name, label, type }) => (
                     <label className="form-control w-full" key={name}>
                         <span className="label-text mb-1">{label}</span>

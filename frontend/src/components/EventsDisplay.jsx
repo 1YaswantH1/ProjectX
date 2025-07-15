@@ -121,9 +121,7 @@ const EventsDisplay = () => {
                   {new Date(event.registrationStartDate).toLocaleString()} →{" "}
                   {new Date(event.registrationEndDate).toLocaleString()}
                 </p>
-                <p className="text-sm text-gray-500 mt-2">
-                  Created by: {event.createdBy}
-                </p>
+
               </div>
 
               {event.registrationLink && (
