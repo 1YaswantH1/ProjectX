@@ -56,7 +56,7 @@ const Carousel = ({ images }) => {
   const slideImages = [...images, images[0]];
 
   return (
-    <div className="relative w-full h-[50vh] overflow-hidden rounded-box bg-black">
+    <div className="relative w-full h-[70vh] overflow-hidden rounded-box bg-black">
       <div
         ref={trackRef}
         className={`flex h-full ${isTransitioning ? "transition-transform duration-700 ease-in-out" : ""

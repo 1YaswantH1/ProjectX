@@ -21,7 +21,7 @@ export default function Home() {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="mt-16 rounded-xl overflow-hidden shadow-md z-10 relative"
+                className="overflow-hidden shadow-md z-10 relative"
             >
                 <Carousel images={images} />
             </motion.section>
